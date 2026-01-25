@@ -41,7 +41,7 @@ export default function CategoryGrid(): JSX.Element {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <Link href={`/productos?categoria=${categoria.id}`}>
-                <div className="group relative aspect-[4/5] overflow-hidden bg-stone-200">
+                <div className="group relative aspect-4/5 overflow-hidden bg-stone-200">
                   <Image
                     src={categoria.imagen}
                     alt={categoria.nombre}
@@ -49,7 +49,7 @@ export default function CategoryGrid(): JSX.Element {
                     sizes="(max-width: 768px) 50vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-stone-900/80 via-stone-900/20 to-transparent" />
                   
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <h3 className="font-serif text-2xl md:text-3xl mb-2 tracking-wide">
