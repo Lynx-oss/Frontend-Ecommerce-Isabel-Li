@@ -45,7 +45,7 @@ export default function Home() {
                 <Image
                   src={img}
                   alt={`Instagram ${i + 1}`}
-                  fill
+                  fill  
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/30 transition-colors duration-300" />
