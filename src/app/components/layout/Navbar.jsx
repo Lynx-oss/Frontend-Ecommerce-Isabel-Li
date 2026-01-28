@@ -6,8 +6,8 @@ import { Search, ShoppingBag, User, Menu, Heart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useRouter, useSearchParams } from 'next/navigation';
-
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/hooks/useCart';
 const categories = [
   { name: 'Remeras y Tops', slug: 'remeras-tops', id: 1 },
   { name: 'Pantalones', slug: 'pantalones', id: 2 },
@@ -23,7 +23,9 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { totalItems } = useCart();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -36,6 +38,7 @@ export default function Navbar() {
     if (searchQuery.trim()) {
       router.push(`/productos?search=${encodeURIComponent(searchQuery)}`);
       setSearchOpen(false);
+      setSearchQuery('');
     }
   };
 
@@ -44,9 +47,8 @@ export default function Navbar() {
       scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white'
     }`}>
       <div className="bg-stone-900 text-white text-center py-2 text-xs tracking-widest">
-
-        test text 
-              </div>
+        ENVÍO GRATIS EN COMPRAS +$50.000 | 3 CUOTAS SIN INTERÉS
+      </div>
 
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
@@ -121,9 +123,9 @@ export default function Navbar() {
             <Link href="/carrito">
               <Button variant="ghost" size="icon" className="relative hover:bg-transparent">
                 <ShoppingBag className="h-5 w-5" />
-                {cartCount > 0 && (
+                {totalItems > 0 && (
                   <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-amber-700 text-white text-xs flex items-center justify-center">
-                    {cartCount}
+                    {totalItems}
                   </span>
                 )}
               </Button>
