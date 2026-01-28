@@ -84,7 +84,7 @@ export default function Pagination({
                             ) : (
                                 <button
                                     onClick={() => onPageChange(page as number)}
-                                    className={`min-w-[40px] px-3 py-2 rounded-md text-sm font-medium transition-all ${currentPage === page
+                                    className={`min-w-10 px-3 py-2 rounded-md text-sm font-medium transition-all ${currentPage === page
                                         ? 'bg-stone-900 text-white'
                                         : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900'
                                         }`}
