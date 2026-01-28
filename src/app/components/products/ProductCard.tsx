@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 import { ShoppingBag, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Producto } from '@/types';
+import { useCart } from '@/hooks/useCart';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   producto: Producto;
@@ -16,6 +18,7 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [ImageError, setImageError] = useState<boolean>(false);
+  const { addItem } = useCart();
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('es-AR', {
@@ -26,6 +29,15 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
   };
 
   const imagenUrl = ImageError ? 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li' : producto.imagenUrl || 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li';
+  
+  const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    addItem(producto);
+    toast.success('Producto agregado al carrito', {
+      description: producto.nombre,
+    });
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,7 +48,7 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
       className="group relative"
     >
       <Link href={`/productos/${producto.id}`}>
-        <div className="relative aspect-[3/4] overflow-hidden bg-stone-100 mb-4">
+        <div className="relative aspect-3/4 overflow-hidden bg-stone-100 mb-4">
           <Image
             src={imagenUrl}
             alt={producto.nombre}
@@ -54,10 +66,7 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
             <Button
               size="sm"
               className="bg-white text-stone-900 hover:bg-stone-100 w-full gap-2"
-              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                e.preventDefault();
-                console.log('Agregar al carrito:', producto.id);
-              }}
+              onClick={handleAddToCart}
             >
               <ShoppingBag className="w-4 h-4" />
               Agregar al Carrito
