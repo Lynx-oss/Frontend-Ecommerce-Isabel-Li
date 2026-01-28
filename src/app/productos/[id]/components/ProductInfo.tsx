@@ -5,6 +5,7 @@ import { Producto } from '@/types';
 import { ShoppingBag, Heart, Truck, RefreshCw, Shield, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useCart } from '@/hooks/useCart';
 
 interface ProductInfoProps {
   producto: Producto;
@@ -13,6 +14,8 @@ interface ProductInfoProps {
 export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.Element {
   const [quantity, setQuantity] = useState<number>(1);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const { addItem } = useCart();
+
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('es-AR', {
@@ -31,8 +34,19 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
 
   const handleAddToCart = (): void => {
     // TODO: Implementar despues :)
+    addItem(producto, quantity);
+    toast.success(`${quantity} ${quantity === 1 ? 'unidad agregada' : 'unidades agregadas'} al carrito`, {
+      description: producto.nombre,
+      action: {
+        label: 'ver carrito',
+        onClick: () => {
+          window.location.href = '/carrito';
+        }
+      }
+
+    });
+
     console.log('Agregar al carrito:', { producto: producto.id, cantidad: quantity });
-    toast.success(`${quantity} ${quantity === 1 ? 'unidad agregada' : 'unidades agregadas'} al carrito`);
   };
 
   const isOutOfStock = producto.inventario === 0;
