@@ -2,6 +2,7 @@ import { Inter, Playfair_Display, Great_Vibes } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import { CartProvider } from "@/context/cartContext";
 import { Toaster } from "sonner";
 
 const inter = Inter({
@@ -32,10 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
         className={`${inter.variable} ${playfair.variable} ${greatVibes.variable} antialiased`}
       >
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
-        <Toaster position="top-right" />
+        <CartProvider>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+          <Toaster position="top-right"  />
+        </CartProvider>
       </body>
     </html>
   );
