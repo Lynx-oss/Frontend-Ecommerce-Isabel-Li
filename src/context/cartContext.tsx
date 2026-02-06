@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext,  useState, ReactNode, useEffect } from 'react'
+import React, { createContext, useState, ReactNode, useEffect } from 'react'
 import { Producto, CartItem, CartContextType } from '@/types'
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -11,8 +11,8 @@ interface CartProviderProps {
 
 // Función helper para cargar el carrito inicial
 function getInitialCart(): CartItem[] {
-    if (typeof window === 'undefined') return []; 
-    
+    if (typeof window === 'undefined') return [];
+
     try {
         const savedCart = localStorage.getItem('isabel-li-cart');
         if (savedCart) {
@@ -26,6 +26,7 @@ function getInitialCart(): CartItem[] {
 
 export function CartProvider({ children }: CartProviderProps): React.JSX.Element {
     const [items, setItems] = useState<CartItem[]>(getInitialCart);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     // Solo guardar cuando cambien los items
     useEffect(() => {
@@ -37,13 +38,19 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
             const existingItem = currentItems.find((item) => item.producto.id === producto.id);
 
             if (existingItem) {
-                return currentItems.map((item) => 
-                    item.producto.id === producto.id 
-                        ? { ...item, cantidad: item.cantidad + cantidad } 
+                return currentItems.map((item) =>
+                    item.producto.id === producto.id
+                        ? { ...item, cantidad: item.cantidad + cantidad }
                         : item
                 )
             } else {
-                return [...currentItems, { producto, cantidad }];
+                // Generate unique ID for cart item (use producto.id or timestamp for variations)
+                const cartItemId = Date.now();
+                return [...currentItems, {
+                    id: cartItemId,
+                    producto,
+                    cantidad
+                }];
             }
         })
     }
@@ -58,10 +65,10 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
             return;
         }
 
-        setItems((currentItems) => 
-            currentItems.map((item) => 
-                item.producto.id === productoId 
-                    ? { ...item, cantidad } 
+        setItems((currentItems) =>
+            currentItems.map((item) =>
+                item.producto.id === productoId
+                    ? { ...item, cantidad }
                     : item
             )
         );
@@ -73,6 +80,7 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
 
     const totalItems = items.reduce((sum, item) => sum + item.cantidad, 0);
     const totalPrice = items.reduce((sum, item) => sum + item.producto.precio * item.cantidad, 0);
+    const subtotal = totalPrice; // Alias for compatibility
 
     const value: CartContextType = {
         items,
@@ -82,6 +90,8 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
         clearCart,
         totalItems,
         totalPrice,
+        isLoading,
+        subtotal,
     }
 
     return <CartContext.Provider value={value}>{children}</CartContext.Provider>
