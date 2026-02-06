@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 export interface Categoria {
   id: number;
   nombre: string;
@@ -9,7 +11,7 @@ export interface Producto {
   descripcion: string;
   precio: number;
   inventario: number;
-  imagenUrl: string;
+  imagenes: string[];
   categoria?: Categoria;
 }
 
@@ -19,8 +21,11 @@ export interface CategoriaConImagen extends Categoria {
 }
 
 export interface CartItem {
+  id: number;
   producto: Producto;
   cantidad: number;
+  talle?: string;
+  color?: string;
 }
 
 export interface CartContextType {
@@ -31,5 +36,57 @@ export interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
-
+  isLoading: boolean;
+  subtotal: number;
 }
+
+export interface Usuario {
+  email: string;
+  nombre: string;
+  rol: 'USER' | 'ADMIN';
+}
+
+
+export interface AuthResponse {
+  token: string;
+  email: string;
+  nombre: string;
+  rol: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  nombre: string;
+  apellido?: string;
+  telefono?: string;
+}
+
+export interface AuthContextType {
+  user: Usuario | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  login: (data: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+}
+
+
+export interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export interface ApiErrorResponse {
+  message?: string;
+  error?: string;
+}
+
+
