@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Producto } from '@/types';
 import { ShoppingBag, Heart, Truck, RefreshCw, Shield, Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,24 @@ interface ProductInfoProps {
   producto: Producto;
 }
 
+const FAVORITES_KEY = 'isabel-li-favoritos';
+
 export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.Element {
   const [quantity, setQuantity] = useState<number>(1);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { addItem } = useCart();
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(FAVORITES_KEY);
+      if (saved) {
+        const favorites: Producto[] = JSON.parse(saved);
+        setIsFavorite(favorites.some(p => p.id === producto.id));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }, [producto.id]);
 
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('es-AR', {
@@ -33,7 +46,6 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
   };
 
   const handleAddToCart = (): void => {
-    // TODO: Implementar despues :)
     addItem(producto, quantity);
     toast.success(`${quantity} ${quantity === 1 ? 'unidad agregada' : 'unidades agregadas'} al carrito`, {
       description: producto.nombre,
@@ -43,10 +55,30 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
           window.location.href = '/carrito';
         }
       }
-
     });
+  };
 
-    console.log('Agregar al carrito:', { producto: producto.id, cantidad: quantity });
+  const handleToggleFavorite = (): void => {
+    try {
+      const saved = localStorage.getItem(FAVORITES_KEY);
+      let favorites: Producto[] = saved ? JSON.parse(saved) : [];
+
+      if (isFavorite) {
+        favorites = favorites.filter(p => p.id !== producto.id);
+        toast.success('Eliminado de favoritos');
+      } else {
+        favorites.push(producto);
+        toast.success('Agregado a favoritos', {
+          description: producto.nombre,
+        });
+      }
+
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+      toast.error('Error al actualizar favoritos');
+    }
   };
 
   const isOutOfStock = producto.inventario === 0;
@@ -75,15 +107,14 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
       </div>
 
       <div className="flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${
-          isOutOfStock ? 'bg-red-500' : 
-          producto.inventario < 5 ? 'bg-amber-500' : 
-          'bg-green-500'
-        }`} />
+        <div className={`w-2 h-2 rounded-full ${isOutOfStock ? 'bg-red-500' :
+            producto.inventario < 5 ? 'bg-amber-500' :
+              'bg-green-500'
+          }`} />
         <span className="text-sm text-stone-600">
-          {isOutOfStock ? 'Sin stock' : 
-           producto.inventario < 5 ? `Solo ${producto.inventario} unidades disponibles` :
-           'En stock'}
+          {isOutOfStock ? 'Sin stock' :
+            producto.inventario < 5 ? `Solo ${producto.inventario} unidades disponibles` :
+              'En stock'}
         </span>
       </div>
 
@@ -133,11 +164,11 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
         <Button
           variant="outline"
           size="icon"
-          onClick={() => setIsFavorite(!isFavorite)}
+          onClick={handleToggleFavorite}
           className="h-12 w-12"
           aria-label={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
         >
-          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+          <Heart className={`w-5 h-5 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
         </Button>
       </div>
 
