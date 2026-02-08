@@ -11,11 +11,13 @@ interface ProductGalleryProps {
 
 export default function ProductGallery({ producto }: ProductGalleryProps): React.JSX.Element {
   const [selectedImage] = useState<string>(
-    producto.imagenUrl || 'https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'
+    producto.imagenes?.[0] || 'https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'
   );
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
 
-  const images = [producto.imagenUrl || 'https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'];
+  const images = producto.imagenes && producto.imagenes.length > 0
+    ? producto.imagenes
+    : ['https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'];
 
   return (
     <div className="space-y-4">
@@ -28,7 +30,7 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
           className="object-cover"
           priority
         />
-        
+
         <button
           onClick={() => setIsZoomed(true)}
           className="absolute top-4 right-4 p-3 bg-white/90 hover:bg-white rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
@@ -70,7 +72,7 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
       )}
 
       {isZoomed && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
           onClick={() => setIsZoomed(false)}
         >
