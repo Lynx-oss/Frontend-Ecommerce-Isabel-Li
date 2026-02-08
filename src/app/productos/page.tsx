@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getProductos, getCategorias } from '@/lib/api';
 import ProductCard from '../components/products/ProductCard';
@@ -14,7 +14,7 @@ import { Producto } from '@/types';
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ProductosPage() {
+function ProductosContent() {
     const searchParams = useSearchParams();
     const [productos, setProductos] = useState<Producto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -269,5 +269,20 @@ export default function ProductosPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ProductosPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-stone-900 mx-auto mb-4"></div>
+                    <p className="text-stone-600">Cargando productos...</p>
+                </div>
+            </div>
+        }>
+            <ProductosContent />
+        </Suspense>
     );
 }
