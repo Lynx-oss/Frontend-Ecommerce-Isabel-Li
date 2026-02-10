@@ -34,6 +34,14 @@ function ProductosContent() {
     const categorias = getCategorias();
 
     useEffect(() => {
+        setSelectedCategoria(urlCategoria ? parseInt(urlCategoria) : null);
+    }, [urlCategoria]);
+
+    useEffect(() => {
+        setSearchQuery(urlSearch || '');
+    }, [urlSearch]);
+
+    useEffect(() => {
         const fetchProductos = async () => {
             try {
                 setLoading(true);
@@ -132,7 +140,7 @@ function ProductosContent() {
 
     return (
         <div className="min-h-screen bg-stone-50">
-            <section className="bg-white border-b border-stone-200">
+            <section>
                 <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
                     <span className="text-amber-700 text-xs tracking-[0.3em] mb-2 block text-center">
                         COLECCIÓN
@@ -140,9 +148,7 @@ function ProductosContent() {
                     <h1 className="font-serif text-4xl md:text-5xl tracking-wide text-stone-900 mb-4 text-center">
                         {selectedCategoria ? categorias.find(c => c.id === selectedCategoria)?.nombre : 'Todos los Productos'}
                     </h1>
-                    <p className="text-stone-600 text-center">
-                        {filteredAndSortedProducts.length} productos encontrados
-                    </p>
+
                 </div>
             </section>
 
@@ -176,7 +182,11 @@ function ProductosContent() {
                             />
                             <div className="w-80 max-w-full bg-white h-full overflow-y-auto p-6">
                                 <div className="flex items-center justify-between mb-6">
-                                    <h3 className="font-serif text-xl">Filtros</h3>
+                                    <h3 className="font-serif text-xl">
+
+
+
+                                    </h3>
                                     <button
                                         onClick={() => setShowMobileFilters(false)}
                                         className="p-2 hover:bg-stone-100 rounded-full transition-colors"
