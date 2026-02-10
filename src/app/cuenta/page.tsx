@@ -34,22 +34,22 @@ export default function CuentaPage() {
             icon: User,
             label: 'Mi perfil',
             description: 'Ver y editar mi información personal',
-            href: '/cuenta',
-            color: 'bg-stone-100 text-stone-600'
+            href: '/cuenta/perfil',
+            color: 'bg-stone-100 text-black-600'
         },
         {
             icon: Package,
             label: 'Mis pedidos',
             description: 'Ver historial de compras y estado de envíos',
             href: '/pedidos',
-            color: 'bg-blue-50 text-blue-600'
+            color: 'bg-blue-50 text-black-600'
         },
         {
             icon: Heart,
             label: 'Favoritos',
             description: 'Productos guardados para después',
             href: '/favoritos',
-            color: 'bg-rose-50 text-rose-600'
+            color: 'bg-rose-50 text-black-600'
         },
     ];
 
