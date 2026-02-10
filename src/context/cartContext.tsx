@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from 'react'
 import { Producto, CartItem, CartContextType } from '@/types'
+import { toast } from 'sonner'
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
 
@@ -34,6 +35,14 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
     }, [items]);
 
     const addItem = (producto: Producto, cantidad: number = 1): void => {
+        const existingItem = items.find((item) => item.producto.id === producto.id);
+        const currentQty = existingItem ? existingItem.cantidad : 0;
+
+        if (currentQty + cantidad > producto.inventario) {
+            toast.error(`No puedes agregar más. Stock disponible: ${producto.inventario}`);
+            return;
+        }
+
         setItems((currentItems) => {
             const existingItem = currentItems.find((item) => item.producto.id === producto.id);
 
@@ -44,7 +53,6 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
                         : item
                 )
             } else {
-                // Generate unique ID for cart item (use producto.id or timestamp for variations)
                 const cartItemId = Date.now();
                 return [...currentItems, {
                     id: cartItemId,
@@ -53,6 +61,7 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
                 }];
             }
         })
+        toast.success('Producto agregado al carrito');
     }
 
     const removeItem = (productoId: number): void => {
@@ -62,6 +71,12 @@ export function CartProvider({ children }: CartProviderProps): React.JSX.Element
     const updateQuantity = (productoId: number, cantidad: number): void => {
         if (cantidad <= 0) {
             removeItem(productoId);
+            return;
+        }
+
+        const itemToUpdate = items.find(i => i.producto.id === productoId);
+        if (itemToUpdate && cantidad > itemToUpdate.producto.inventario) {
+            toast.error(`Stock máximo alcanzado (${itemToUpdate.producto.inventario})`);
             return;
         }
 
