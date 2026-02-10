@@ -35,18 +35,16 @@ interface Orden {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
 const statusColors: Record<string, string> = {
-    PENDIENTE: 'bg-yellow-100 text-yellow-800',
-    PAGADO: 'bg-blue-100 text-blue-800',
-    PROCESANDO: 'bg-purple-100 text-purple-800',
-    ENVIADO: 'bg-indigo-100 text-indigo-800',
-    ENTREGADO: 'bg-green-100 text-green-800',
-    CANCELADO: 'bg-red-100 text-red-800'
+    PENDIENTE: 'bg-yellow-100 text-black-800 hover:bg-yellow-100',
+    PAGADO: 'bg-blue-100 text-black-800 hover:bg-blue-100',
+    ENVIADO: 'bg-indigo-100 text-black-800 hover:bg-indigo-100',
+    ENTREGADO: 'bg-green-100 text-black-800 hover:bg-green-100',
+    CANCELADO: 'bg-red-100 text-black-800 hover:bg-red-100'
 };
 
 const statusLabels: Record<string, string> = {
     PENDIENTE: 'Pendiente',
     PAGADO: 'Pagado',
-    PROCESANDO: 'Procesando',
     ENVIADO: 'Enviado',
     ENTREGADO: 'Entregado',
     CANCELADO: 'Cancelado'
@@ -139,12 +137,12 @@ export default function PedidosPage() {
                     ) : (
                         <div className="space-y-4">
                             {ordenes.map((orden) => (
-                                <Card key={orden.id} className="hover:shadow-md transition-shadow">
+                                <Card key={orden.id} className="shadow-none hover:shadow-none transition-none">
                                     <CardContent className="p-6">
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-4">
                                                 <div className="p-3 rounded-lg bg-blue-50">
-                                                    <Package className="h-6 w-6 text-blue-600" />
+                                                    <Package className="h-6 w-6 text-black" />
                                                 </div>
                                                 <div>
                                                     <p className="font-medium">Pedido #{orden.id}</p>
