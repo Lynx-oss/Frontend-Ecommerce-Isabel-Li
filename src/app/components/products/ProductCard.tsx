@@ -14,9 +14,25 @@ interface ProductCardProps {
   producto: Producto;
 }
 
+const FAVORITES_KEY = 'isabel-li-favoritos';
+
+function getInitialFavorite(productId: number): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const saved = localStorage.getItem(FAVORITES_KEY);
+    if (saved) {
+      const favorites: Producto[] = JSON.parse(saved);
+      return favorites.some(p => p.id === productId);
+    }
+  } catch (error) {
+    console.error('Error loading favorites:', error);
+  }
+  return false;
+}
+
 export default function ProductCard({ producto }: ProductCardProps): React.JSX.Element {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(() => getInitialFavorite(producto.id));
   const [ImageError, setImageError] = useState<boolean>(false);
   const { addItem } = useCart();
 
@@ -28,8 +44,8 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
     }).format(price);
   };
 
-  const imagenUrl = ImageError ? 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li' : producto.imagenUrl || 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li';
-  
+  const imagenUrl = ImageError ? 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li' : producto.imagenes?.[0] || 'https://placehold.co/600x800/e7e5e4/78716c?text=Isabel-Li';
+
   const handleAddToCart = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
     addItem(producto);
@@ -37,7 +53,34 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
       description: producto.nombre,
     });
   };
-  
+
+  const handleToggleFavorite = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+
+    try {
+      const saved = localStorage.getItem(FAVORITES_KEY);
+      let favorites: Producto[] = saved ? JSON.parse(saved) : [];
+
+      if (isFavorite) {
+        // Remove from favorites
+        favorites = favorites.filter(p => p.id !== producto.id);
+        toast.success('Eliminado de favoritos');
+      } else {
+        // Add to favorites
+        favorites.push(producto);
+        toast.success('Agregado a favoritos', {
+          description: producto.nombre,
+        });
+      }
+
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+      setIsFavorite(!isFavorite);
+    } catch (error) {
+      console.error('Error updating favorites:', error);
+      toast.error('Error al actualizar favoritos');
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -74,16 +117,11 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
           </motion.div>
 
           <button
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault();
-              setIsFavorite(!isFavorite);
-            }}
+            onClick={handleToggleFavorite}
             className="absolute top-4 right-4 p-2 bg-white/90 rounded-full hover:bg-white transition-colors z-10"
           >
             <Heart
-              className={`w-4 h-4 ${
-                isFavorite ? 'fill-red-500 text-red-500' : 'text-stone-600'
-              }`}
+              className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-stone-600'}`}
             />
           </button>
 
