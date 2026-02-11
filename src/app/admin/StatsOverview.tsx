@@ -158,101 +158,163 @@ export default function StatsOverview() {
   ];
 
   const exportToExcel = async () => {
-    const workbook = new ExcelJs.Workbook();
-    workbook.creator = 'Isabel Li';
-    workbook.created = new Date();
+    try {
+      const workbook = new ExcelJs.Workbook();
+      workbook.creator = 'Isabel Li';
+      workbook.created = new Date();
 
-    const start = startOfMonth(selectedDate);
-    const end = endOfMonth(selectedDate);
-    const monthName = format(selectedDate, 'MMMM yyyy', { locale: es });
-    const cleanMonthName = format(selectedDate, 'MMM-yyyy', { locale: es });
+      const start = startOfMonth(selectedDate);
+      const end = endOfMonth(selectedDate);
+      const monthName = format(selectedDate, 'MMMM yyyy', { locale: es });
+      const cleanMonthName = format(selectedDate, 'MMM-yyyy', { locale: es });
 
-    const ordenesMes = ordenes.filter(orden => {
-      if (!orden.createdAt) return false;
-      const fechaOrden = new Date(orden.createdAt);
-      return fechaOrden >= start && fechaOrden <= end;
-    });
-
-    const sheet1 = workbook.addWorksheet('Detalle Órdenes');
-    sheet1.columns = [
-      { header: 'N° Orden', key: 'id', width: 12 },
-      { header: 'Fecha', key: 'fecha', width: 15 },
-      { header: 'Cliente', key: 'cliente', width: 25 },
-      { header: 'Email', key: 'email', width: 30 },
-      { header: 'Total', key: 'total', width: 12 },
-      { header: 'Estado', key: 'estado', width: 15 }
-    ];
-
-    sheet1.getRow(1).font = { bold: true };
-    sheet1.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '' } };
-
-    ordenesMes.forEach(orden => {
-      const usuario = orden.usuario || orden.user || orden.cliente;
-      const email = usuario?.email || '-';
-
-      sheet1.addRow({
-        id: orden.id,
-        fecha: orden.createdAt ? format(new Date(orden.createdAt), 'dd/MM/yyyy') : '-',
-        cliente: usuario?.nombre || 'Cliente',
-        email: email,
-        total: orden.total || 0,
-        estado: orden.estado
+      const ordenesMes = ordenes.filter(orden => {
+        if (!orden.createdAt) return false;
+        const fechaOrden = new Date(orden.createdAt);
+        return fechaOrden >= start && fechaOrden <= end;
       });
-    });
 
-    const sheet2 = workbook.addWorksheet('Ventas Diarias');
-    sheet2.columns = [
-      { header: 'Día', key: 'dia', width: 10 },
-      { header: 'Fecha', key: 'fecha', width: 15 },
-      { header: 'Cantidad Órdenes', key: 'cantidad', width: 18 },
-      { header: 'Total Ventas', key: 'ventas', width: 15 }
-    ];
+      const sheet1 = workbook.addWorksheet('Detalle Órdenes');
+      sheet1.columns = [
+        { header: 'N° Orden', key: 'id', width: 12 },
+        { header: 'Fecha', key: 'fecha', width: 15 },
+        { header: 'Cliente', key: 'cliente', width: 25 },
+        { header: 'Email', key: 'email', width: 30 },
+        { header: 'Total', key: 'total', width: 12 },
+        { header: 'Estado', key: 'estado', width: 15 }
+      ];
 
-    sheet2.getRow(1).font = { bold: true };
-    sheet2.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4ECDC4' } };
+      sheet1.getRow(1).font = { bold: true };
+      sheet1.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '' } };
 
-    const ventasPorDia: Record<string, { cantidad: number; total: number; fullDate: string }> = {};
+      ordenesMes.forEach(orden => {
+        const usuario = orden.usuario || orden.user || orden.cliente;
+        const email = usuario?.email || '-';
 
-    const daysInMonth = eachDayOfInterval({ start, end });
-    daysInMonth.forEach(day => {
-      const dayKey = format(day, 'dd');
-      ventasPorDia[dayKey] = {
-        cantidad: 0,
-        total: 0,
-        fullDate: format(day, 'dd/MM/yyyy')
-      };
-    });
+        sheet1.addRow({
+          id: orden.id,
+          fecha: orden.createdAt ? format(new Date(orden.createdAt), 'dd/MM/yyyy') : '-',
+          cliente: usuario?.nombre || 'Cliente',
+          email: email,
+          total: orden.total || 0,
+          estado: orden.estado
+        });
+      });
 
-    ordenesMes.forEach(orden => {
-      if (orden.createdAt && validRevenueStatuses.includes(orden.estado)) {
-        const fecha = new Date(orden.createdAt);
-        const dayKey = format(fecha, 'dd');
-        if (ventasPorDia[dayKey]) {
-          ventasPorDia[dayKey].cantidad++;
-          ventasPorDia[dayKey].total += orden.total || 0;
+      const sheet2 = workbook.addWorksheet('Ventas Diarias');
+      sheet2.columns = [
+        { header: 'Día', key: 'dia', width: 10 },
+        { header: 'Fecha', key: 'fecha', width: 15 },
+        { header: 'Cantidad Órdenes', key: 'cantidad', width: 18 },
+        { header: 'Total Ventas', key: 'ventas', width: 15 }
+      ];
+
+      sheet2.getRow(1).font = { bold: true };
+      sheet2.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4ECDC4' } };
+
+      const ventasPorDia: Record<string, { cantidad: number; total: number; fullDate: string }> = {};
+
+      const daysInMonth = eachDayOfInterval({ start, end });
+      daysInMonth.forEach(day => {
+        const dayKey = format(day, 'dd');
+        ventasPorDia[dayKey] = {
+          cantidad: 0,
+          total: 0,
+          fullDate: format(day, 'dd/MM/yyyy')
+        };
+      });
+
+      ordenesMes.forEach(orden => {
+        if (orden.createdAt && validRevenueStatuses.includes(orden.estado)) {
+          const fecha = new Date(orden.createdAt);
+          const dayKey = format(fecha, 'dd');
+          if (ventasPorDia[dayKey]) {
+            ventasPorDia[dayKey].cantidad++;
+            ventasPorDia[dayKey].total += orden.total || 0;
+          }
         }
-      }
-    });
-
-    Object.entries(ventasPorDia).forEach(([dia, data]) => {
-      sheet2.addRow({
-        dia: dia,
-        fecha: data.fullDate,
-        cantidad: data.cantidad,
-        ventas: data.total
       });
-    });
 
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `reporte_ventas_${cleanMonthName}.xlsx`;
-    a.click();
-    URL.revokeObjectURL(url);
+      Object.entries(ventasPorDia).forEach(([dia, data]) => {
+        sheet2.addRow({
+          dia: dia,
+          fecha: data.fullDate,
+          cantidad: data.cantidad,
+          ventas: data.total
+        });
+      });
+
+      const totalCantidadMes = Object.values(ventasPorDia).reduce((sum, d) => sum + d.cantidad, 0);
+      const totalVentasMes = Object.values(ventasPorDia).reduce((sum, d) => sum + d.total, 0);
+      const totalRow = sheet2.addRow({
+        dia: '',
+        fecha: 'TOTAL MES',
+        cantidad: totalCantidadMes,
+        ventas: totalVentasMes
+      });
+      totalRow.font = { bold: true };
+      totalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
+
+      const sheet3 = workbook.addWorksheet('Resumen Mensual');
+      sheet3.columns = [
+        { header: 'Mes', key: 'mes', width: 20 },
+        { header: 'Cantidad Órdenes', key: 'cantidad', width: 18 },
+        { header: 'Ingresos Totales', key: 'ingresos', width: 18 }
+      ];
+
+      sheet3.getRow(1).font = { bold: true };
+      sheet3.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92D050' } };
+
+      const ingresosPorMes: Record<string, { cantidad: number; total: number; sortKey: string }> = {};
+
+      ordenes.forEach(orden => {
+        if (!orden.createdAt) return;
+        if (!validRevenueStatuses.includes(orden.estado)) return;
+        const fecha = new Date(orden.createdAt);
+        const mesKey = format(fecha, 'MMMM yyyy', { locale: es });
+        const sortKey = format(fecha, 'yyyy-MM');
+        if (!ingresosPorMes[mesKey]) {
+          ingresosPorMes[mesKey] = { cantidad: 0, total: 0, sortKey };
+        }
+        ingresosPorMes[mesKey].cantidad++;
+        ingresosPorMes[mesKey].total += orden.total || 0;
+      });
+
+      const mesesOrdenados = Object.entries(ingresosPorMes)
+        .sort((a, b) => a[1].sortKey.localeCompare(b[1].sortKey));
+
+      let granTotal = 0;
+      mesesOrdenados.forEach(([mes, data]) => {
+        sheet3.addRow({
+          mes: mes.charAt(0).toUpperCase() + mes.slice(1),
+          cantidad: data.cantidad,
+          ingresos: data.total
+        });
+        granTotal += data.total;
+      });
+
+      const granTotalRow = sheet3.addRow({
+        mes: 'GRAN TOTAL',
+        cantidad: mesesOrdenados.reduce((sum, [, d]) => sum + d.cantidad, 0),
+        ingresos: granTotal
+      });
+      granTotalRow.font = { bold: true };
+      granTotalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reporte_ventas_${cleanMonthName}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error al exportar Excel:', error);
+      alert('Error al generar el Excel. Revisá la consola del navegador para más detalles.');
+    }
   };
   return (
     <div className="space-y-6">
@@ -299,7 +361,7 @@ export default function StatsOverview() {
                 <YAxis stroke="#888" />
                 <Tooltip
                   labelFormatter={(label) => `Día ${label}`}
-                  formatter={(value: any) => [`$${value}`, 'Ventas']}
+                  formatter={(value: string | number | (string | number)[] | undefined) => [`$${value ?? 0}`, 'Ventas']}
                   contentStyle={{
                     backgroundColor: 'white',
                     border: '1px solid #e5e5e5',
