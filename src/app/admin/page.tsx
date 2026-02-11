@@ -74,7 +74,7 @@ export default function AdminDashboard() {
               value="categories"
               className="flex items-center gap-2 px-4 py-2 data-[state=active]:bg-orange-50 data-[state=active]:text-black"
             >
-              <span className="p-1.5 rounded-md bg-orange-50/70">
+              <span className="p-1.5 rounded-md bg-black-50/70">
                 <Tags className="h-4 w-4 " />
               </span>
               Categorías
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
               value="orders"
               className="flex items-center gap-2 px-4 py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-black"
             >
-              <span className="p-1.5 rounded-md bg-blue-50/70">
+              <span className="p-1.5 rounded-md bg-black-50/70">
                 <ShoppingCart className="h-4 w-4 " />
               </span>
               Pedidos
