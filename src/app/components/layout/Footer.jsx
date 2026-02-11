@@ -1,14 +1,12 @@
 import React from 'react';
-import Link from 'next/link'; // Importante para la navegación de Next.js
+import Link from 'next/link'; 
 import { Instagram, Facebook, Mail, Phone, MapPin } from 'lucide-react';
-// Ajusté estas rutas asumiendo que tus componentes UI están en src/components/ui
 import { Input } from '@/components/ui/input'; 
 import { Button } from '@/components/ui/button';
 
 export default function Footer() {
   return (
     <footer className="bg-stone-100">
-      {/* Newsletter */}
       <div className="bg-stone-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h3 className="font-serif text-2xl md:text-3xl tracking-wide mb-2">
