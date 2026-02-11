@@ -4,6 +4,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import { CartProvider } from "@/context/cartContext";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/context/authContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,12 +34,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
         className={`${inter.variable} ${playfair.variable} ${greatVibes.variable} antialiased`}
       >
-        <CartProvider>
-          <Navbar />
-          <main>{children}</main>
-          <Footer />
-          <Toaster position="top-right"  />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <main>{children}</main>
+            <Footer />
+            <Toaster position="top-right"  />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
