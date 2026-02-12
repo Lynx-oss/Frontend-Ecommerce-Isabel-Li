@@ -144,7 +144,7 @@ export default function StatsOverview() {
       icon: DollarSign,
       color: 'bg-green-500',
       textColor: 'black',
-      change: '+12.5%'
+      change: `${ordenes.filter(o => validRevenueStatuses.includes(o.estado)).length} órdenes cobradas`
     },
     {
       title: 'Pedidos',
