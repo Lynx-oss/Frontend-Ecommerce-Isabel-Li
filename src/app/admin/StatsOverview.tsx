@@ -21,11 +21,19 @@ interface Producto {
   precio: number;
 }
 
+interface ItemOrden {
+  id: number;
+  producto: Producto;
+  cantidad: number;
+  precioUnitario: number;
+}
+
 interface Orden {
   id: number;
   total: number;
   estado: string;
   createdAt: string;
+  items?: ItemOrden[];
   usuario?: { nombre: string; email: string };
   user?: { nombre: string; email: string };
   cliente?: { nombre: string; email: string };
@@ -95,15 +103,22 @@ export default function StatsOverview() {
     });
   }, [ordenes, selectedDate]);
 
-  const categoryData = productos.reduce((acc: Record<string, number>, product) => {
-    const cat = product.categoria?.nombre || 'Sin categoría';
-    acc[cat] = (acc[cat] || 0) + 1;
-    return acc;
-  }, {});
+  const categoryRevenueData = ordenes
+    .filter(order => validRevenueStatuses.includes(order.estado))
+    .reduce((acc: Record<string, number>, order) => {
+      if (order.items) {
+        order.items.forEach(item => {
+          const cat = item.producto?.categoria?.nombre || 'Sin categoría';
+          const subtotal = (item.precioUnitario || 0) * (item.cantidad || 0);
+          acc[cat] = (acc[cat] || 0) + subtotal;
+        });
+      }
+      return acc;
+    }, {});
 
-  const categoryChartData = Object.entries(categoryData).map(([name, value]) => ({
+  const categoryChartData = Object.entries(categoryRevenueData).map(([name, value]) => ({
     name: name.charAt(0).toUpperCase() + name.slice(1),
-    cantidad: value
+    ingresos: Math.round(value)
   }));
 
   if (loading) {
@@ -184,8 +199,8 @@ export default function StatsOverview() {
         { header: 'Estado', key: 'estado', width: 15 }
       ];
 
-      sheet1.getRow(1).font = { bold: true };
-      sheet1.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '' } };
+      sheet1.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      sheet1.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB45309' } };
 
       ordenesMes.forEach(orden => {
         const usuario = orden.usuario || orden.user || orden.cliente;
@@ -209,8 +224,8 @@ export default function StatsOverview() {
         { header: 'Total Ventas', key: 'ventas', width: 15 }
       ];
 
-      sheet2.getRow(1).font = { bold: true };
-      sheet2.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4ECDC4' } };
+      sheet2.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      sheet2.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB45309' } };
 
       const ventasPorDia: Record<string, { cantidad: number; total: number; fullDate: string }> = {};
 
@@ -235,7 +250,7 @@ export default function StatsOverview() {
         }
       });
 
-      Object.entries(ventasPorDia).forEach(([dia, data]) => {
+      Object.entries(ventasPorDia).sort(([a], [b]) => a.localeCompare(b)).forEach(([dia, data]) => {
         sheet2.addRow({
           dia: dia,
           fecha: data.fullDate,
@@ -262,8 +277,8 @@ export default function StatsOverview() {
         { header: 'Ingresos Totales', key: 'ingresos', width: 18 }
       ];
 
-      sheet3.getRow(1).font = { bold: true };
-      sheet3.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92D050' } };
+      sheet3.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      sheet3.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB45309' } };
 
       const ingresosPorMes: Record<string, { cantidad: number; total: number; sortKey: string }> = {};
 
@@ -300,6 +315,39 @@ export default function StatsOverview() {
       });
       granTotalRow.font = { bold: true };
       granTotalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
+
+      // Hoja 4: Ingresos por Categoría
+      const sheet4 = workbook.addWorksheet('Ingresos por Categoría');
+      sheet4.columns = [
+        { header: 'Categoría', key: 'categoria', width: 25 },
+        { header: 'Ingresos ($)', key: 'ingresos', width: 18 },
+        { header: '% del Total', key: 'porcentaje', width: 15 }
+      ];
+
+      sheet4.getRow(1).font = { bold: true };
+      sheet4.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB45309' } };
+      sheet4.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      const totalIngresosCat = categoryChartData.reduce((sum, cat) => sum + cat.ingresos, 0);
+
+      [...categoryChartData]
+        .sort((a, b) => b.ingresos - a.ingresos)
+        .forEach(cat => {
+          sheet4.addRow({
+            categoria: cat.name,
+            ingresos: cat.ingresos,
+            porcentaje: totalIngresosCat > 0 ? `${((cat.ingresos / totalIngresosCat) * 100).toFixed(1)}%` : '0%'
+          });
+        });
+
+
+      const catTotalRow = sheet4.addRow({
+        categoria: 'TOTAL',
+        ingresos: totalIngresosCat,
+        porcentaje: '100%'
+      });
+      catTotalRow.font = { bold: true };
+      catTotalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
 
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
@@ -388,7 +436,7 @@ export default function StatsOverview() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Productos por Categoría</CardTitle>
+            <CardTitle>Ingresos por Categoría</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -397,13 +445,14 @@ export default function StatsOverview() {
                 <XAxis dataKey="name" stroke="#888" />
                 <YAxis stroke="#888" />
                 <Tooltip
+                  formatter={(value: number | undefined) => [`$${(value ?? 0).toLocaleString()}`, 'Ingresos']}
                   contentStyle={{
                     backgroundColor: 'white',
                     border: '1px solid #e5e5e5',
                     borderRadius: '8px'
                   }}
                 />
-                <Bar dataKey="cantidad" fill="#b45309" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="ingresos" fill="#b45309" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
