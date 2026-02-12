@@ -5,6 +5,7 @@ import Footer from "./components/layout/Footer";
 import { CartProvider } from "@/context/cartContext";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/context/authContext";
+import { CategoriasProvider } from "@/context/categoriasContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,12 +36,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${inter.variable} ${playfair.variable} ${greatVibes.variable} antialiased`}
       >
         <AuthProvider>
+          <CategoriasProvider>
           <CartProvider>
             <Navbar />
             <main>{children}</main>
             <Footer />
             <Toaster position="top-right"  />
           </CartProvider>
+          </CategoriasProvider>
         </AuthProvider>
       </body>
     </html>
