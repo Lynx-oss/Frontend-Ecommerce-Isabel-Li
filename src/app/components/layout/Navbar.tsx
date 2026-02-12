@@ -9,16 +9,9 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/hooks/useCart';
 import UserMenu from './UserMenu';
+import { useCategorias } from '@/hooks/useCategorias';
 
-const categories = [
-  { name: 'Remeras y Tops', slug: 'remeras-tops', id: 1 },
-  { name: 'Pantalones', slug: 'pantalones', id: 2 },
-  { name: 'Vestidos', slug: 'vestidos', id: 3 },
-  { name: 'Buzos y Sweaters', slug: 'buzos-sweaters', id: 4 },
-  { name: 'Camperas', slug: 'camperas', id: 5 },
-  { name: 'Accesorios', slug: 'accesorios', id: 6 },
-  { name: 'Camisas', slug: 'camisas', id: 7 },
-];
+
 
 export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -26,6 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const router = useRouter();
   const { totalItems } = useCart();
+  const { categorias } = useCategorias();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -67,13 +61,13 @@ export default function Navbar() {
                   >
                     INICIO
                   </Link>
-                  {categories.map((cat) => (
+                  {categorias.map((cat) => (
                     <Link
-                      key={cat.slug}
+                      key={cat.id}
                       href={`/productos?categoria=${cat.id}`}
                       className="block text-sm tracking-wider hover:text-stone-900 transition-colors text-stone-600"
                     >
-                      {cat.name.toUpperCase()}
+                      {cat.nombre.toUpperCase()}
                     </Link>
                   ))}
                 </nav>
@@ -155,13 +149,13 @@ export default function Navbar() {
           >
             INICIO
           </Link>
-          {categories.map((cat) => (
+          {categorias.map((cat) => (
             <Link
-              key={cat.slug}
+              key={cat.id}
               href={`/productos?categoria=${cat.id}`}
               className="text-xs tracking-[0.2em] hover:text-stone-900 transition-colors text-stone-600"
             >
-              {cat.name.toUpperCase()}
+              {cat.nombre.toUpperCase()}
             </Link>
           ))}
         </nav>
