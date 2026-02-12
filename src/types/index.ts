@@ -79,6 +79,12 @@ export interface AuthContextType {
   loading: boolean;
 }
 
+export interface CategoriasContextType {
+  categorias: CategoriaConImagen[];
+  loading: boolean;
+  error: string | null;
+}
+
 
 export interface AuthProviderProps {
   children: ReactNode;
