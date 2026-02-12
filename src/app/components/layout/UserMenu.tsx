@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { User, LogOut, Package, Heart, Settings } from 'lucide-react';
@@ -14,8 +14,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
+const emptySubscribe = () => () => { };
+
 export default function UserMenu() {
   const { user, isAuthenticated, logout } = useAuth();
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
 
   const handleLogout = async () => {
     try {
@@ -25,7 +28,7 @@ export default function UserMenu() {
     }
   }
 
-  if (!isAuthenticated) {
+  if (!mounted || !isAuthenticated) {
     return (
       <Link href="/login">
         <Button
