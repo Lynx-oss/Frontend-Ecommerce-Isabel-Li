@@ -10,6 +10,7 @@ import ProductSort, { SortOption } from '../components/products/filters/ProductS
 import Pagination from '../components/products/Pagination';
 import { Filter, X } from 'lucide-react';
 import { Producto } from '@/types';
+import { useCategorias } from '@/hooks/useCategorias';
 
 
 const ITEMS_PER_PAGE = 12;
@@ -31,8 +32,8 @@ function ProductosContent() {
     const [currentPage, setCurrentPage] = useState(1);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-    const categorias = getCategorias();
-
+    const { categorias } = useCategorias();     
+    
     useEffect(() => {
         setSelectedCategoria(urlCategoria ? parseInt(urlCategoria) : null);
     }, [urlCategoria]);
