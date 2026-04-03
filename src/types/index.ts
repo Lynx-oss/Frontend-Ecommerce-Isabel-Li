@@ -12,7 +12,8 @@ export interface Producto {
   precio: number;
   inventario: number;
   imagenes: string[];
-  categoria?: Categoria;
+  categoriaId?: number;
+  categoriaNombre?: string;
 }
 
 export interface CategoriaConImagen extends Categoria {
