@@ -3,12 +3,13 @@ import { useEffect, useState, useContext, useMemo } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
 import { AuthContext } from '@/context/authContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, FolderTree, ShoppingCart, DollarSign, TrendingUp, Users, AlertTriangle, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Package, FolderTree, ShoppingCart, DollarSign, TrendingUp,  AlertTriangle, Download, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import ExcelJs from 'exceljs';
 import { es } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
 
@@ -316,7 +317,6 @@ export default function StatsOverview() {
       granTotalRow.font = { bold: true };
       granTotalRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
 
-      // Hoja 4: Ingresos por Categoría
       const sheet4 = workbook.addWorksheet('Ingresos por Categoría');
       sheet4.columns = [
         { header: 'Categoría', key: 'categoria', width: 25 },
@@ -476,7 +476,7 @@ export default function StatsOverview() {
                 <div key={product.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     {product.imagenes?.[0] && (
-                      <img
+                      <Image
                         src={product.imagenes[0]}
                         alt={product.nombre}
                         className="w-12 h-12 object-cover rounded"
