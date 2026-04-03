@@ -22,7 +22,8 @@ interface Producto {
   precio: number;
   inventario: number;
   imagenes: string[];
-  categoria: Categoria;
+  categoriaId: number;
+  categoriaNombre: string;
   destacado?: boolean;
   nuevo?: boolean;
 }
@@ -128,7 +129,7 @@ export default function ProductsManager() {
         descripcion: product.descripcion || '',
         precio: product.precio?.toString() || '',
         inventario: product.inventario?.toString() || '',
-        categoriaId: product.categoria?.id?.toString() || '',
+        categoriaId: product.categoriaId?.toString() || '',
         imagenes: product.imagenes?.length > 0 ? product.imagenes : [''],
         destacado: product.destacado || false,
         nuevo: product.nuevo || false
@@ -211,7 +212,7 @@ export default function ProductsManager() {
   };
 
   const filteredProducts = productos
-    .filter(p => p.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) || p.categoria?.nombre?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(p => p.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) || p.categoriaId?.toString().toLowerCase().includes(searchQuery.toLowerCase()))
     .filter(p => !showLowStockOnly || (p.inventario || 0) < 10)
     .sort((a, b) => {
       if (!sortConfig) return 0;
@@ -231,8 +232,8 @@ export default function ProductsManager() {
       }
 
       if (key === 'categoria') {
-        const catA = a.categoria?.nombre || '';
-        const catB = b.categoria?.nombre || '';
+        const catA = a.categoriaNombre || '';
+        const catB = b.categoriaNombre || '';
         return direction === 'asc'
           ? catA.localeCompare(catB)
           : catB.localeCompare(catA);
@@ -508,7 +509,7 @@ export default function ProductsManager() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="capitalize">{product.categoria?.nombre}</TableCell>
+                  <TableCell className="capitalize">{product.categoriaNombre}</TableCell>
                   <TableCell>${product.precio?.toLocaleString()}</TableCell>
                   <TableCell>
                     <Badge variant={product.inventario < 10 ? 'destructive' : 'default'}>
