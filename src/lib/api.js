@@ -26,7 +26,7 @@ api.interceptors.request.use(
 export const getProductos = async () => {
     try {
         const response = await api.get('/productos');
-        return response.data;
+        return response.data.content;
     } catch (error) {
         console.error('error fetching productos', error);
         throw error;
