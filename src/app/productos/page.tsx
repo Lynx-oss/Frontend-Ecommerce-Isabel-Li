@@ -64,7 +64,7 @@ function ProductosContent() {
         let result = [...productos];
 
         if (selectedCategoria !== null) {
-            result = result.filter(p => p.categoria?.id === selectedCategoria);
+            result = result.filter(p => p.categoriaId === selectedCategoria);
         }
 
         if (searchQuery.trim()) {
