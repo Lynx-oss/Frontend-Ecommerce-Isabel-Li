@@ -14,7 +14,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface OrdenItem {
   id: number;
-  producto: { nombre: string };
+  productoNombre: string;
+  productoId: number;
+  productoImagen?: string;
   cantidad: number;
   subtotal: number;
   talla?: string;
@@ -236,7 +238,7 @@ export default function OrdersManager() {
                   {selectedOrder.items?.map((item) => (
                     <div key={item.id} className="flex justify-between p-3 bg-stone-50 rounded">
                       <div>
-                        <p className="font-medium">{item.producto?.nombre}</p>
+                        <p className="font-medium">{item.productoNombre}</p>
                         <p className="text-sm text-stone-600">
                           {item.talla && `Talla: ${item.talla}`}
                           {item.color && ` • Color: ${item.color}`}
