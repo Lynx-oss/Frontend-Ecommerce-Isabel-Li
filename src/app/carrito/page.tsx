@@ -96,6 +96,8 @@ export default function CarritoPage() {
         setOrderSuccess(true);
         clearCart();
         toast.success('¡Pedido realizado con éxito!');
+        const waUrl = buildWhatsAppUrl(data.id);
+        setTimeout(() => window.open(waUrl, '_blank'), 1000);
       } else {
         if (response.status === 403) {
           toast.error('No tienes permiso para realizar esta acción. Intentá iniciar sesión nuevamente.');
@@ -121,6 +123,36 @@ export default function CarritoPage() {
     setCheckoutOpen(false);
     setOrderSuccess(false);
     router.push('/pedidos');
+  };
+
+  const buildWhatsAppUrl = (orderId: number): string => {
+    const phone = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || '5491140360229';
+
+    const productLines = items.map(item => `${item.producto.nombre} x${item.cantidad} - $${(item.producto.precio * item.cantidad).toLocaleString('es-AR')}`).join('\n');
+
+    const message =
+`NUEVO PEDIDO - Isabel & Li
+Pedido #${orderId}
+
+PRODUCTOS:
+${productLines}
+
+DATOS DE ENTREGA:
+Nombre: ${auth?.user?.nombre || 'Cliente'}
+Direccion: ${formData.direccion}, ${formData.ciudad}, CP ${formData.codigoPostal}
+Telefono: ${formData.telefono}
+${formData.notas ? `Notas: ${formData.notas}` : ''}
+
+RESUMEN:
+Subtotal: $${subtotal.toLocaleString('es-AR')}
+Envio: ${shipping === 0 ? 'Gratis' : `$${shipping.toLocaleString('es-AR')}`}
+TOTAL: $${totalWithShipping.toLocaleString('es-AR')}
+
+Quedo a la espera de confirmacion para coordinar pago y entrega.`;
+
+
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    return url;
   };
 
   if (isLoading) {
@@ -200,7 +232,7 @@ export default function CarritoPage() {
                     >
                       <Link
                         href={`/productos/${item.producto?.id}`}
-                        className="flex-shrink-0 group"
+                        className="shrink-0 group"
                       >
                         <div className="relative w-28 h-36 bg-stone-100 overflow-hidden">
                           {item.producto?.imagenes?.[0] ? (
@@ -303,7 +335,7 @@ export default function CarritoPage() {
                   />
                   <Button
                     variant="outline"
-                    className="rounded-none border-stone-300 hover:bg-stone-50 flex-shrink-0 px-3"
+                    className="rounded-none border-stone-300 hover:bg-stone-50 shrink-0 px-3"
                   >
                     <Tag className="h-4 w-4" />
                   </Button>
@@ -377,7 +409,7 @@ export default function CarritoPage() {
               <p className="text-lg font-medium mb-2">¡Gracias por tu compra!</p>
               <p className="text-stone-500 mb-6">
                 Tu pedido #{orderId} ha sido registrado.<br />
-                Te contactaremos pronto para coordinar el pago y envío.
+                En un momento se abrira WhatsApp para confirmar con la tienda 
               </p>
               <Button
                 onClick={handleCloseSuccess}
