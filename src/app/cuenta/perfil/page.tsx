@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthContext } from '@/context/authContext';
@@ -16,14 +16,6 @@ export default function PerfilPage() {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
     const [nombre, setNombre] = useState(auth?.user?.nombre || '');
-    const prevNombreRef = useRef(auth?.user?.nombre);
-
-    if (auth?.user?.nombre !== prevNombreRef.current) {
-        prevNombreRef.current = auth?.user?.nombre;
-        if (auth?.user?.nombre) {
-            setNombre(auth.user.nombre);
-        }
-    }
 
     useEffect(() => {
         if (!auth?.isAuthenticated) {
@@ -76,7 +68,7 @@ export default function PerfilPage() {
                 <h1 className="font-serif text-3xl tracking-wide mb-8">Mi Perfil</h1>
 
                 <Card className="mb-6 overflow-hidden">
-                    <div className="h-24 bg-gradient-to-r from-amber-100 via-stone-100 to-amber-50" />
+                    <div className="h-24 bg-linear-to-r from-amber-100 via-stone-100 to-amber-50" />
                     <CardContent className="relative pt-0 pb-6">
                         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 -mt-12">
                             <div className="w-24 h-24 rounded-full bg-amber-200 border-4 border-white shadow-md flex items-center justify-center shrink-0">
