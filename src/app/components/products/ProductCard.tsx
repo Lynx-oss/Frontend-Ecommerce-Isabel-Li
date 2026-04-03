@@ -141,7 +141,7 @@ export default function ProductCard({ producto }: ProductCardProps): React.JSX.E
 
       <div className="space-y-1">
         <p className="text-xs text-stone-500 tracking-wider uppercase">
-          {producto.categoria?.nombre || 'Sin categoría'}
+          {producto.categoriaNombre || 'Sin categoría'}
         </p>
         <Link href={`/productos/${producto.id}`}>
           <h3 className="font-medium text-stone-900 group-hover:text-amber-700 transition-colors line-clamp-1">
