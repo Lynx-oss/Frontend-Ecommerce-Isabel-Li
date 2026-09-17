@@ -73,7 +73,8 @@ export default function OrdersManager() {
         headers: { 'Authorization': `Bearer ${auth?.token}` },
       });
       if (res.ok) {
-        setOrdenes(await res.json());
+        const data = await res.json();
+        setOrdenes(Array.isArray(data) ? data : (data?.content || []));
       }
     } catch (error) {
       console.error('Error:', error);
