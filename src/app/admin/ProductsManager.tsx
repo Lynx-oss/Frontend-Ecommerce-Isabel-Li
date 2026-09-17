@@ -105,14 +105,19 @@ export default function ProductsManager() {
     setFormData({ ...formData, imagenes: newImages.length > 0 ? newImages : [''] });
   };
 
-  const fetchData = async () => {
+    const fetchData = async () => {
     try {
       const [prodRes, catRes] = await Promise.all([
         fetch(`${API_URL}/productos`),
         fetch(`${API_URL}/categorias`),
       ]);
-      setProductos(await prodRes.json());
-      setCategorias(await catRes.json());
+      
+      const prodData = await prodRes.json();
+      const catData = await catRes.json();
+
+      setProductos(Array.isArray(prodData) ? prodData : (prodData?.content || []));
+      setCategorias(Array.isArray(catData) ? catData : (catData?.content || []));
+ 
     } catch (error) {
       console.error('Error:', error);
       toast.error('Error al cargar datos');
