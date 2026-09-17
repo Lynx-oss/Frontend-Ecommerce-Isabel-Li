@@ -58,11 +58,16 @@ export default function StatsOverview() {
             headers: { 'Authorization': `Bearer ${auth?.token}` }
           }).catch(() => ({ ok: false, json: () => Promise.resolve([]) }))
         ]);
+        
+        const prodData = await prodRes.json();
+        const catData = await catRes.json();
 
-        setProductos(await prodRes.json());
-        setCategorias(await catRes.json());
+        setProductos(Array.isArray(prodData) ? prodData : (prodData?.content || []));
+        setCategorias(Array.isArray(catData) ? catData : (catData?.content || []));
+
         if (ordRes.ok) {
-          setOrdenes(await ordRes.json());
+          const ordData = await ordRes.json();
+          setOrdenes(Array.isArray(ordData) ? ordData : (ordData?.content || []));
         }
       } catch (error) {
         console.error('Error loading stats:', error);
