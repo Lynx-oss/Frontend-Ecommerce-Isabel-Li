@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AuthContext } from '@/context/authContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,6 +14,9 @@ import { toast } from 'sonner';
 
 interface OrdenItem {
     id: number;
+    productoNombre?: string;
+    productoId?: number;
+    productoImagen?: string;
     producto: { nombre: string };
     cantidad: number;
     subtotal: number;
@@ -72,7 +75,9 @@ export default function PedidosPage() {
                 headers: { 'Authorization': `Bearer ${auth?.token}` },
             });
             if (res.ok) {
-                setOrdenes(await res.json());
+                const data = await res.json();
+                setOrdenes(Array.isArray(data) ? data : (data?.content || []));
+                
             }
         } catch (error) {
             console.error('Error:', error);
@@ -209,7 +214,7 @@ export default function PedidosPage() {
                                     {selectedOrder.items?.map((item) => (
                                         <div key={item.id} className="flex justify-between p-3 bg-stone-50 rounded">
                                             <div>
-                                                <p className="font-medium">{item.producto?.nombre}</p>
+                                                <p className="font-medium">{item.productoNombre || item.producto?.nombre || 'Producto'}</p>
                                                 <p className="text-sm text-stone-600">
                                                     {item.talla && `Talla: ${item.talla}`}
                                                     {item.color && ` • Color: ${item.color}`}
