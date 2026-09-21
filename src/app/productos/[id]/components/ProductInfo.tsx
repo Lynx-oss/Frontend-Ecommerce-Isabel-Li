@@ -1,5 +1,5 @@
 'use client';
-
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { Producto } from '@/types';
 import { ShoppingBag, Heart, Truck, RefreshCw, Shield, Minus, Plus } from 'lucide-react';
@@ -17,6 +17,7 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
   const [quantity, setQuantity] = useState<number>(1);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const { addItem } = useCart();
+  const router = useRouter();
 
   useEffect(() => {
     try {
@@ -52,7 +53,7 @@ export default function ProductInfo({ producto }: ProductInfoProps): React.JSX.E
       action: {
         label: 'ver carrito',
         onClick: () => {
-          window.location.href = '/carrito';
+          router.push('/carrito');
         }
       }
     });
