@@ -10,20 +10,23 @@ interface ProductGalleryProps {
 }
 
 export default function ProductGallery({ producto }: ProductGalleryProps): React.JSX.Element {
-  const [selectedImage] = useState<string>(
-    producto.imagenes?.[0] || 'https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'
-  );
-  const [isZoomed, setIsZoomed] = useState<boolean>(false);
-
   const images = producto.imagenes && producto.imagenes.length > 0
     ? producto.imagenes
     : ['https://placehold.co/800x1000/e7e5e4/78716c?text=Isabel-Li'];
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isZoomed, setIsZoomed] = useState<boolean>(false);
+
+  // Si la imagen seleccionada no pertenece al producto actual (ej. al cambiar de prenda), usa la primera por defecto
+  const currentImage = selectedImage && images.includes(selectedImage)
+    ? selectedImage
+    : images[0];
 
   return (
     <div className="space-y-4">
       <div className="relative aspect-3/4 bg-stone-100 overflow-hidden rounded-lg group">
         <Image
-          src={selectedImage}
+          src={currentImage}
           alt={producto.nombre}
           fill
           sizes="(max-width: 1024px) 100vw, 50vw"
@@ -32,8 +35,9 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
         />
 
         <button
+          type="button"
           onClick={() => setIsZoomed(true)}
-          className="absolute top-4 right-4 p-3 bg-white/90 hover:bg-white rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+          className="absolute top-4 right-4 p-3 bg-white/90 hover:bg-white rounded-full transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
           aria-label="Ampliar imagen"
         >
           <ZoomIn className="w-5 h-5 text-stone-900" />
@@ -54,20 +58,30 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
 
       {images.length > 1 && (
         <div className="grid grid-cols-4 gap-2">
-          {images.map((img, index) => (
-            <button
-              key={index}
-              className="relative aspect-square bg-stone-100 rounded-lg overflow-hidden border-2 border-transparent hover:border-stone-300 transition-colors"
-            >
-              <Image
-                src={img}
-                alt={`${producto.nombre} - Vista ${index + 1}`}
-                fill
-                sizes="25vw"
-                className="object-cover"
-              />
-            </button>
-          ))}
+          {images.map((img, index) => {
+            const isCurrent = currentImage === img;
+            return (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setSelectedImage(img)}
+                aria-label={`Ver imagen ${index + 1}`}
+                className={`relative aspect-square bg-stone-100 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                  isCurrent
+                    ? 'border-stone-900 shadow-sm opacity-100'
+                    : 'border-transparent hover:border-stone-300 opacity-70 hover:opacity-100'
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`${producto.nombre} - Vista ${index + 1}`}
+                  fill
+                  sizes="25vw"
+                  className="object-cover"
+                />
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -78,7 +92,7 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
         >
           <div className="relative max-w-4xl w-full aspect-3/4">
             <Image
-              src={selectedImage}
+              src={currentImage}
               alt={producto.nombre}
               fill
               sizes="100vw"
@@ -86,8 +100,9 @@ export default function ProductGallery({ producto }: ProductGalleryProps): React
             />
           </div>
           <button
+            type="button"
             onClick={() => setIsZoomed(false)}
-            className="absolute top-4 right-4 text-white text-4xl hover:text-stone-300 transition-colors"
+            className="absolute top-4 right-4 text-white text-4xl hover:text-stone-300 transition-colors cursor-pointer"
           >
             ×
           </button>
